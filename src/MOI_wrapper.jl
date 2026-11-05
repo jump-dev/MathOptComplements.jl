@@ -260,45 +260,6 @@ function MOI.Utilities.map_indices(
     return relax
 end
 
-_additional_arguments(::Optimizer, ::Type) = tuple()
-
-function _additional_arguments(
-    model::Optimizer,
-    ::Type{<:Bridges.NonlinearBridge},
-)
-    # Create a 1-element tuple since it is splatted in `add_bridged_constraint`
-    return (model.reformulation,)
-end
-
-# TODO(blegat): it would be nice if MOI was defining this
-# `MOI.Bridges.additional_arguments` function and already had this
-# implementation of `add_bridged_constraint` so that I don't have to reimplement
-# it
-function MOI.Bridges.add_bridged_constraint(b::Optimizer, BridgeType, f, s)
-    map = MOI.Bridges.Constraint.bridges(b)::MOI.Bridges.Constraint.Map
-    # `bridge_constraint` may add bridges that also need `final_touch` and, as
-    # explained in the default implementation, `bridge` must come *before* them
-    # in `needs_final_touch`, hence the `insert!` at the remembered position.
-    n_final_touch = length(map.needs_final_touch)
-    bridge = MOI.Bridges.Constraint.bridge_constraint(
-        BridgeType,
-        MOI.Bridges.recursive_model(b),
-        f,
-        s,
-        _additional_arguments(b, BridgeType)...,
-    )
-    # The rest is copy-pasted from the default implementation of
-    # `add_bridged_constraint` in MOI
-    if MOI.Bridges.needs_final_touch(bridge)
-        insert!(map.needs_final_touch, n_final_touch + 1, bridge)
-    end
-    ci = MOI.Bridges.Constraint.add_key_for_bridge(
-        map,
-        bridge,
-        f,
-        s,
-        !Base.Fix1(MOI.is_valid, MOI.Bridges.Variable.bridges(b)),
-    )
-    MOI.Bridges.Variable.register_context(MOI.Bridges.Variable.bridges(b), ci)
-    return ci
+function Bridges._default_reformulation(model::Optimizer, ::Type)
+    return model.reformulation
 end

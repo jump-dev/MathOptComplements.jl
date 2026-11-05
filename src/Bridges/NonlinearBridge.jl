@@ -42,20 +42,22 @@ mutable struct NonlinearBridge{T,S} <: MOI.Bridges.Constraint.AbstractBridge
     reformulation::AbstractComplementarityRelaxation
 end
 
+# Only `MathOptComplements.Optimizer` supports setting a custom default
+# reformulation so the default is used when the bridge is added for instance to
+# `MOI.Bridges.LazyBridgeOptimizer`
+function _default_reformulation(::MOI.ModelLike, ::Type{T}) where {T}
+    return ScholtesRelaxation(zero(T))
+end
+
 function MOI.Bridges.Constraint.bridge_constraint(
     ::Type{NonlinearBridge{T,S}},
     model::MOI.ModelLike,
     func::MOI.VectorOfVariables,
     set::ComplementsWithSetType{S},
-    # Only `MathOptComplements.Optimizer` supports setting custom bridge arguments
-    # so the default will be used when the bridge is added for instance to
-    # `MOI.Bridges.LazyBridgeOptimizer`
-    reformulation::AbstractComplementarityRelaxation = ScholtesRelaxation(
-        zero(T),
-    ),
 ) where {T,S}
     # Delay reformulation until `final_touch` so that per-constraint
     # `ComplementarityReformulation` attributes can override it first.
+    reformulation = _default_reformulation(model, T)
     return NonlinearBridge{T,S}([], func, set, reformulation)
 end
 
