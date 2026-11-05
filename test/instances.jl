@@ -82,9 +82,9 @@ end
 # Nonlinear complementarity constraints
 function dempe_model()
     model = Model()
-    @variable(model, x, start=0.183193)
-    @variable(model, z, start=0.428106)
-    @variable(model, 0 <= w, start=3.00379)
+    @variable(model, x, start = 0.183193)
+    @variable(model, z, start = 0.428106)
+    @variable(model, 0 <= w, start = 3.00379)
     @objective(model, Min, (x - 3.5)^2 + (z + 4.0)^2)
     @constraint(model, z - 3.0 + 2.0 * z * w == 0.0)
     # Complementary constraint
@@ -112,9 +112,9 @@ function design_centering_model()
     ]
     l0 = [0.5, 0.5153882031999911, 0.4999999999777709]
     model = Model()
-    @variable(model, x[i=1:3], start=x0[i])
-    @variable(model, y[j=1:2, k=1:3], start=y0[j, k])
-    @variable(model, 0 <= l[k=1:3], start=l0[k])
+    @variable(model, x[i=1:3], start = x0[i])
+    @variable(model, y[j=1:2, k=1:3], start = y0[j, k])
+    @variable(model, 0 <= l[k=1:3], start = l0[k])
     # ... maximize the volume of the inscribed body
     @objective(model, Min, -pi*x[3]^2)
     # ... lower level solutions lie in body G
@@ -146,8 +146,8 @@ end
 function scholtes4_model()
     z0 = [0, 1]
     model = Model()
-    @variable(model, z[i=1:2] >= 0.0, start=z0[i])
-    @variable(model, z3, start=0.0)
+    @variable(model, z[i=1:2] >= 0.0, start = z0[i])
+    @variable(model, z3, start = 0.0)
     @objective(model, Min, z[1] + z[2] - z3)
     @constraint(model, -4 * z[1] + z3 <= 0)
     @constraint(model, -4 * z[2] + z3 <= 0)
@@ -185,8 +185,8 @@ end
 
 function ralph_2_model()
     model = Model()
-    @variable(model, x >= 0.0, start=1.0)
-    @variable(model, y >= 0.0, start=1.0)
+    @variable(model, x >= 0.0, start = 1.0)
+    @variable(model, y >= 0.0, start = 1.0)
     @objective(model, Min, x^2 + y^2 - 4*x*y)
     @constraint(model, [x, y] ∈ MOI.Complements(2))
     return model
@@ -217,9 +217,9 @@ end
 =#
 function gauvin_model()
     model = Model()
-    @variable(model, 0 <= x <= 15, start=7.5)
+    @variable(model, 0 <= x <= 15, start = 7.5)
     @variable(model, 0 <= y)
-    @variable(model, 0 <= u, start=1.0)
+    @variable(model, 0 <= u, start = 1.0)
     @objective(model, Min, x^2 + (y-10.0)^2)
     @constraint(model, [4 * (x + 2*y - 30) + u, y] ∈ MOI.Complements(2))
     @constraint(model, [(20 - x - y), u] ∈ MOI.Complements(2))
@@ -239,8 +239,8 @@ function hakonsen_model_broken()
     G = 25.0
     pL = 1.0
     model = Model()
-    @variable(model, x[1:2] >= 0.0, start=1.0)
-    @variable(model, l >= 0.0, start=1.0)
+    @variable(model, x[1:2] >= 0.0, start = 1.0)
+    @variable(model, l >= 0.0, start = 1.0)
     @variable(model, 0.0 <= p[1:2])
     @variable(model, t[1:2] >= 0.0)
     @objective(model, Min, (x[1] * x[2] * l)^(1/3))
@@ -271,8 +271,8 @@ function qpec2_model()
     rr = -1.0
     ss = -2.0
     model = Model()
-    @variable(model, x[1:n], start=1.0)
-    @variable(model, y[1:m] >= 0.0, start=1.0)
+    @variable(model, x[1:n], start = 1.0)
+    @variable(model, y[1:m] >= 0.0, start = 1.0)
     @variable(model, s[1:n] >= 0.0)
     @objective(
         model,
@@ -420,15 +420,15 @@ function water_net_model()
     # N.B. : solution found is highly sensitive to the initial values of (qp, qn)
     @variable(model, 0 <= qp[arcs])
     @variable(model, 0 <= qn[arcs])
-    @variable(model, dmin <= d[arcs] <= dmax, start=davg)
+    @variable(model, dmin <= d[arcs] <= dmax, start = davg)
     @variable(
         model,
         h[i in nodes],
-        start=hl[i] + 5.0,
-        lower_bound=hl[i],
-        upper_bound=100
+        start = hl[i] + 5.0,
+        lower_bound = hl[i],
+        upper_bound = 100
     )
-    @variable(model, 0 <= s[i in reservoirs] <= supply[i], start=rr*supply[i])
+    @variable(model, 0 <= s[i in reservoirs] <= supply[i], start = rr*supply[i])
 
     @objective(
         model,
